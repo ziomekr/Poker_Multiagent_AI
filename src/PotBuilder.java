@@ -8,6 +8,13 @@ public class PotBuilder {
     int currentBetSize = 0;
     private boolean allInWasMade = false;
     public PotBuilder(){this.mainPot = new Pot();}
+    public int getCurrentPlayerParticipationInPot(Player p){
+        for(Bet b : mainPot.bets){
+            if(b.bettingPlayer == p)
+                return b.betSize;
+        }
+        return 0;
+    }
     public int processBet(Bet b){
         if(b.betSize==Constants.BET_FOLD){
             playerFold(b);
@@ -108,5 +115,6 @@ public class PotBuilder {
         }
         return minBet;
     }
+
 
 }
