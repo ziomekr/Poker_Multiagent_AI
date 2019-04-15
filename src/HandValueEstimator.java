@@ -4,7 +4,7 @@ import java.util.Collections;
 public class HandValueEstimator {
 
     public PokerHands PokerHand;
-    public Card PokerHandHighestCard = new Card();
+    public CardRank HandHighestCard;
     public ArrayList<Card> Kickers = new ArrayList<>();
 
     private int[] HandRanks = new int[Constants.RANKS + 1];
@@ -12,6 +12,7 @@ public class HandValueEstimator {
     private int maxCardMultiplicity = 0;
     private boolean isFlush = false;
     private boolean isStraight;
+    private CardColor FlushColor;
     ArrayList<Card> Hand;
 
     public HandValueEstimator(ArrayList<Card> Hand){
@@ -30,7 +31,7 @@ public class HandValueEstimator {
             HandColors[c.Color.getColorValue()] += 1;
             if(HandColors[c.Color.getColorValue()] == Constants.CARDS_PER_HAND){
                 isFlush = true;
-                PokerHandHighestCard.Color = c.Color;
+                FlushColor = c.Color;
             }
         }
         isStraight = checkForStraight();
@@ -60,14 +61,14 @@ public class HandValueEstimator {
         for(int rank = Constants.RANKS; rank>-1; rank--){
             if(HandRanks[rank]>0){
                 if(cardsForStraight == 0)
-                    PokerHandHighestCard.Rank = CardRank.getCardRankFromValue(rank);
+                    HandHighestCard = CardRank.getCardRankFromValue(rank);
                 cardsForStraight += 1;
                 if(cardsForStraight == Constants.CARDS_PER_HAND)
                     return true;
             }
             else{
                 cardsForStraight = 0;
-                PokerHandHighestCard.Rank = null;
+                HandHighestCard = null;
             }
         }
         return false;
@@ -85,7 +86,7 @@ public class HandValueEstimator {
         for(int rank=Constants.RANKS; rank > 0; rank--){
             if(HandRanks[rank] == 4){
                 PokerHand = PokerHands.FOUROFAKIND;
-                PokerHandHighestCard.Rank = CardRank.getCardRankFromValue(rank);
+                HandHighestCard = CardRank.getCardRankFromValue(rank);
                 for(Card c : Hand){
                     if(c.Rank.getRankValue() != rank){
                         Kickers.add(c);
@@ -104,7 +105,7 @@ public class HandValueEstimator {
                 for(int pair_rank=Constants.RANKS; pair_rank > 0; pair_rank--){
                     if(HandRanks[pair_rank] == 2){
                         PokerHand = PokerHands.FULLHOUSE;
-                        PokerHandHighestCard.Rank = CardRank.getCardRankFromValue(three_rank);
+                        HandHighestCard = CardRank.getCardRankFromValue(three_rank);
                         Kickers.add(new Card(null,CardRank.getCardRankFromValue(pair_rank)));
                         return true;
                     }
@@ -119,9 +120,9 @@ public class HandValueEstimator {
             PokerHand = PokerHands.FLUSH;
             boolean highestCardUpdated = false;
             for(Card c : Hand){
-                if (c.Color == PokerHandHighestCard.Color){
+                if (c.Color == FlushColor){
                     if(!highestCardUpdated){
-                        PokerHandHighestCard.Rank = c.Rank;
+                        HandHighestCard = c.Rank;
                         highestCardUpdated = true;
                     }
                     else{
@@ -147,7 +148,7 @@ public class HandValueEstimator {
         for(int rank=Constants.RANKS; rank > 0; rank--){
             if(HandRanks[rank] == 3){
                 PokerHand = PokerHands.THREEOFAKIND;
-                PokerHandHighestCard.Rank = CardRank.getCardRankFromValue(rank);
+                HandHighestCard = CardRank.getCardRankFromValue(rank);
                 for(Card c : Hand){
                     if(c.Rank != CardRank.getCardRankFromValue(rank)){
                         Kickers.add(c);
@@ -166,7 +167,7 @@ public class HandValueEstimator {
                 for(int lower_pair_rank = higher_pair_rank - 1; lower_pair_rank > 0; lower_pair_rank--){
                     if(HandRanks[lower_pair_rank] == 2){
                         PokerHand = PokerHands.TWOPAIRS;
-                        PokerHandHighestCard.Rank = CardRank.getCardRankFromValue(higher_pair_rank);
+                        HandHighestCard = CardRank.getCardRankFromValue(higher_pair_rank);
                         Kickers.add(new Card(null, CardRank.getCardRankFromValue(lower_pair_rank)));
                         for(Card c : Hand){
                             if(c.Rank != CardRank.getCardRankFromValue(higher_pair_rank) && c.Rank!=CardRank.getCardRankFromValue(lower_pair_rank)){
@@ -185,9 +186,9 @@ public class HandValueEstimator {
         for(int rank = Constants.RANKS; rank > 0; rank--){
             if(HandRanks[rank] == 2){
                 PokerHand = PokerHands.PAIR;
-                PokerHandHighestCard.Rank = CardRank.getCardRankFromValue(rank);
+                HandHighestCard = CardRank.getCardRankFromValue(rank);
                 for(Card c : Hand){
-                    if(c.Rank != PokerHandHighestCard.Rank){
+                    if(c.Rank != HandHighestCard){
                         Kickers.add(c);
                         if (Kickers.size() == Constants.CARDS_PER_HAND - 2){
                             return true;
@@ -201,7 +202,7 @@ public class HandValueEstimator {
 
     private void hasHighCard(){
         PokerHand = PokerHands.HIGHCARD;
-        PokerHandHighestCard = Hand.get(0);
+        HandHighestCard = Hand.get(0).Rank;
         for(int card_index = 1; card_index<Constants.CARDS_PER_HAND; card_index++){
             Kickers.add(Hand.get(card_index));
         }
