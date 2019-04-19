@@ -1,0 +1,3 @@
+public enum BetType {
+    ILLEGAL, BIGBLIND, SMALLBLIND, CHECK, BET, RAISE, FOLD, ALLIN
+}

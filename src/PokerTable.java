@@ -89,18 +89,5 @@ public class PokerTable {
             bet = reader.nextInt();
         }
     }
-    private void getBlindsFromPlayers(){
-        getSmallBlind();
-        getBigBlind();
-    }
-    //TODO: add heads up mode to blinds
-    private void getSmallBlind(){
-        Player p = Players.get(dealerPosition+1);
-        Pot.processBet(new Bet(p, bigBlinds[blindsLevel]/2));
-    }
 
-    private void getBigBlind(){
-        Player p = Players.get(dealerPosition+2);
-        Pot.processBet(new Bet(p, bigBlinds[blindsLevel]));
-    }
 }
